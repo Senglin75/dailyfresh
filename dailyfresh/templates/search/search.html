@@ -1,0 +1,52 @@
+{% extends 'base_detail_list.html' %}
+{% block title %}天天生鲜-列表页{% endblock title %}
+{% load staticfiles %}
+{% block main_content %}
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="">搜索&nbsp;&nbsp;{{ query }}&nbsp;&nbsp;结果如下:</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+        {% comment %}
+        haystack 在检索到用户输入的关键字所对应的索引后,会向 template/search/search.html 文件传递上下文
+        其中,上下文内容为:
+            query: 用户输入的搜索关键字
+            page: 当前页面的 page 对象(生成器),遍历过后,得到 SearchResult 对象,其中SearchResult.object 是模型类对象
+            paginator: 分页 Paginator 对象
+        {% endcomment %}
+
+        <ul class="goods_type_list clearfix">
+            {% for goods in page %}
+                <li>
+                    <a href="{% url 'goods:detail' goods.object.id %}"><img src="{{ goods.object.image.url }}"></a>
+                    <h4><a href="{% url 'goods:detail' goods.object.id %}">{{ goods.object.name }}</a></h4>
+                    <div class="operate">
+                        <span class="prize">￥{{ goods.object.price }}</span>
+                        <span class="unit">{{ goods.object.price }}/{{ goods.object.unite }}</span>
+                        <a href="#" class="add_goods" title="加入购物车"></a>
+                    </div>
+                </li>
+            {% empty %}
+                <p>未找到相关商品</p>
+            {% endfor %}
+        </ul>
+
+        <div class="pagenation">
+            {% if page.has_previous %}
+                <a href="/search/?q={{ query }}&page={{ page.previous_page_number }}">上一页</a>
+            {% endif %}
+            {% for pindex in paginator.page_range %}
+                {% if pindex == page.number %}
+                    <a href="/search/?q={{ query }}&page={{ pindex }}">{{ pindex }}</a>
+                {% else %}
+                    <a href="/search/?q={{ query }}&page={{ pindex }}" >{{ pindex }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page.has_next %}
+                <a href="/search/?q={{ query }}&page={{ page.next_page_number }}">下一页></a>
+            {% endif %}
+        </div>
+	</div>
+{% endblock main_content %}
